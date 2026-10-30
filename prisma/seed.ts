@@ -63,14 +63,22 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.admin.deleteMany();
 
-  await prisma.admin.create({
-    data: {
-      username: "admin",
-      name: "Shop owner",
-      role: "admin",
-      passwordHash: await bcrypt.hash("RAJ-admin-327", 10),
-    },
-  });
+  const sharedPassword = await bcrypt.hash("RAJ-admin-327", 10);
+  const admins = [
+    ["owner", "Shop owner"],
+    ["staff1", "Staff one"],
+    ["staff2", "Staff two"],
+  ] as const;
+  for (const [username, name] of admins) {
+    await prisma.admin.create({
+      data: {
+        username,
+        name,
+        role: "admin",
+        passwordHash: sharedPassword,
+      },
+    });
+  }
 
   const products = [
     ["aurelia-round", "Aurelia Round", "Aurelia", "A light round frame with a soft front and a comfortable fit for everyday wear.", 14500, "spectacles", "women", "plastic", "round", "percent", 10, true, true, false, false, gallery(spec, 0)],

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   motion,
   useMotionTemplate,
@@ -13,17 +12,23 @@ import {
 import { useRef, type MouseEvent } from "react";
 import { Photo } from "@/components/Photo";
 
-const MotionLink = motion.create(Link);
-
 type LensTurnCardProps = {
   name: string;
   description: string;
   image: string;
-  href: string;
   index?: number;
+  selected?: boolean;
+  onSelect?: () => void;
 };
 
-export function LensTurnCard({ name, description, image, href, index = 0 }: LensTurnCardProps) {
+export function LensTurnCard({
+  name,
+  description,
+  image,
+  index = 0,
+  selected = false,
+  onSelect,
+}: LensTurnCardProps) {
   const reduce = useReducedMotion();
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -41,7 +46,6 @@ export function LensTurnCard({ name, description, image, href, index = 0 }: Lens
     mass: 0.4,
   });
 
-  // Longer scroll window so the turn stays visible while the section is on screen
   const { scrollYProgress } = useScroll({
     target: cardRef,
     offset: ["start 0.95", "end 0.05"],
@@ -50,7 +54,6 @@ export function LensTurnCard({ name, description, image, href, index = 0 }: Lens
   const scrollStart = index % 2 === 0 ? -34 : 34;
   const scrollEnd = index % 2 === 0 ? 18 : -18;
 
-  // Slow plateaus: enter angled → ease upright → hold → leave gently angled
   const scrollRotateYRaw = useTransform(
     scrollYProgress,
     [0, 0.18, 0.42, 0.62, 0.82, 1],
@@ -92,59 +95,78 @@ export function LensTurnCard({ name, description, image, href, index = 0 }: Lens
     mouseY.set(0.5);
   }
 
+  const body = (
+    <>
+      <div
+        className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-[#e8f7fb] via-ice to-[#d9eef8]"
+        style={{ transform: "translateZ(28px)" }}
+      >
+        {reduce ? (
+          <div className="absolute inset-0">
+            <Photo src={image} alt={name} className="object-cover" />
+          </div>
+        ) : (
+          <motion.div className="absolute inset-[-10%] will-change-transform" style={{ rotateY: imageRotateY, scale: 1.1 }}>
+            <Photo src={image} alt={name} className="object-cover" />
+          </motion.div>
+        )}
+        {!reduce ? (
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 mix-blend-soft-light"
+            style={{ background: glareBackground, opacity: 0.55 }}
+          />
+        ) : null}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/20 via-transparent to-white/10" />
+      </div>
+
+      <div className="relative p-6" style={{ transform: "translateZ(40px)" }}>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4a35a]">Lens brand</p>
+        <h3 className="mt-2 font-heading text-2xl font-semibold tracking-tight">{name}</h3>
+        <p className="mt-2 line-clamp-3 text-navy/75">{description}</p>
+        <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-navy transition group-hover:text-[#c4a35a]">
+          {selected ? "Hide details" : "Read details"}
+          <span aria-hidden className="transition duration-300 group-hover:translate-x-1">
+            →
+          </span>
+        </span>
+      </div>
+    </>
+  );
+
   if (reduce) {
     return (
-      <Link href={href} className="group block overflow-hidden rounded-[1.8rem] bg-white shadow-[0_18px_50px_rgba(3,4,94,0.06)]">
-        <div className="relative aspect-[4/3] overflow-hidden bg-ice">
-          <Photo src={image} alt={name} />
-        </div>
-        <div className="p-6">
-          <h3 className="font-heading text-2xl font-semibold">{name}</h3>
-          <p className="mt-2 line-clamp-3 text-navy/75">{description}</p>
-        </div>
-      </Link>
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-pressed={selected}
+        className={`group block w-full overflow-hidden rounded-[1.8rem] border bg-white text-left shadow-[0_18px_50px_rgba(3,4,94,0.06)] transition ${
+          selected ? "border-[#c4a35a]/50" : "border-navy/8"
+        }`}
+      >
+        {body}
+      </button>
     );
   }
 
   return (
     <div ref={cardRef} className="[perspective:1200px]" onMouseMove={onMove} onMouseLeave={onLeave}>
-      <MotionLink
-        href={href}
+      <motion.button
+        type="button"
+        onClick={onSelect}
+        aria-pressed={selected}
         style={{
           rotateX: combinedRotateX,
           rotateY: combinedRotateY,
           scale: scrollScale,
           transformStyle: "preserve-3d",
         }}
-        className="group relative block overflow-hidden rounded-[1.8rem] border border-navy/8 bg-white shadow-[0_24px_60px_rgba(3,4,94,0.1)] will-change-transform"
+        className={`group relative block w-full overflow-hidden rounded-[1.8rem] border bg-white text-left shadow-[0_24px_60px_rgba(3,4,94,0.1)] will-change-transform ${
+          selected ? "border-[#c4a35a]/55" : "border-navy/8"
+        }`}
       >
-        <div
-          className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-[#e8f7fb] via-ice to-[#d9eef8]"
-          style={{ transform: "translateZ(28px)" }}
-        >
-          <motion.div className="absolute inset-[-10%] will-change-transform" style={{ rotateY: imageRotateY, scale: 1.1 }}>
-            <Photo src={image} alt={name} className="object-cover" />
-          </motion.div>
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 mix-blend-soft-light"
-            style={{ background: glareBackground, opacity: 0.55 }}
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/20 via-transparent to-white/10" />
-        </div>
-
-        <div className="relative p-6" style={{ transform: "translateZ(40px)" }}>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4a35a]">Lens brand</p>
-          <h3 className="mt-2 font-heading text-2xl font-semibold tracking-tight">{name}</h3>
-          <p className="mt-2 line-clamp-3 text-navy/75">{description}</p>
-          <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-navy transition group-hover:text-[#c4a35a]">
-            View lenses
-            <span aria-hidden className="transition duration-300 group-hover:translate-x-1">
-              →
-            </span>
-          </span>
-        </div>
-      </MotionLink>
+        {body}
+      </motion.button>
     </div>
   );
 }

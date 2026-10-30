@@ -4,7 +4,9 @@ import { Catalog } from "@/components/Catalog";
 import { audiences } from "@/lib/site";
 
 export function generateMetadata({ params }: { params: Promise<{ audience: string }> }): Promise<Metadata> {
-  return params.then(({ audience }) => ({ title: `${audience[0]?.toUpperCase()}${audience.slice(1)} sunglasses` }));
+  return params.then(({ audience }) => ({
+    title: `${audience[0]?.toUpperCase()}${audience.slice(1)} sunglasses`,
+  }));
 }
 
 export default async function Page({
@@ -24,8 +26,9 @@ export default async function Page({
       basePath={`/sunglasses/${audience}`}
       eyebrow="Sunglasses"
       title={`${match.label}'s sunglasses`}
-      intro={`Sunglasses for ${match.label.toLowerCase()}. Filter by frame type, brand, shape, and price.`}
+      intro={`A refined selection for ${match.label.toLowerCase()}. Filter by frame, brand, shape, and price — then message us on WhatsApp to buy.`}
       searchParams={await searchParams}
+      variant="luxury"
     />
   );
 }

@@ -24,8 +24,9 @@ export default async function Page({
       basePath={`/spectacles/${audience}`}
       eyebrow="Spectacles"
       title={`${label}'s frames`}
-      intro={`Spectacles for ${label.toLowerCase()}, with filters for frame type, brand, shape, and price.`}
+      intro={`A refined selection for ${label.toLowerCase()}. Filter by frame, brand, shape, and price — then message us on WhatsApp to buy.`}
       searchParams={await searchParams}
+      variant="luxury"
     />
   );
 }

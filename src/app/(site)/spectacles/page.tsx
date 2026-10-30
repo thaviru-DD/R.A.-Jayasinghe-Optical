@@ -1,17 +1,25 @@
 import type { Metadata } from "next";
 import { Catalog } from "@/components/Catalog";
 
-export const metadata: Metadata = { title: "Spectacles", description: "Spectacles for men, women, and children at R.A. Jayasinghe Opticians, Ratmalana." };
+export const metadata: Metadata = {
+  title: "Spectacles",
+  description: "Luxury spectacles for men, women, and children at R.A. Jayasinghe Opticians, Ratmalana.",
+};
 
-export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   return (
     <Catalog
       category="spectacles"
       basePath="/spectacles"
       eyebrow="Spectacles"
-      title="Frames for every face"
-      intro="Browse men, women, and children. Filter by frame type, brand, shape, and price. Ask us on WhatsApp when you are ready to buy."
+      title="Frames chosen with care"
+      intro="A refined edit for men, women, and children. Filter by frame, brand, shape, and price — then message us on WhatsApp to buy. No cart, no online payment."
       searchParams={await searchParams}
+      variant="luxury"
     />
   );
 }

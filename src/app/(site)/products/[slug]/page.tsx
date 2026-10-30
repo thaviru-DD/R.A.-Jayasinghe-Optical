@@ -44,12 +44,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <p className="mt-4 text-lg"><PriceTag product={product} /></p>
           <p className="mt-3 inline-flex rounded-full bg-ice px-3 py-1 font-semibold">{product.inStock ? "In stock" : "Out of stock"}</p>
           <p className="mt-6 text-lg leading-8">{product.description}</p>
-          {product.frameType || product.shape ? (
-            <dl className="mt-6 grid grid-cols-2 gap-3">
-              {product.frameType ? <div className="rounded-2xl bg-ice p-4"><dt className="text-sm uppercase tracking-[0.14em]">Frame</dt><dd className="font-semibold">{labelize(product.frameType)}</dd></div> : null}
-              {product.shape ? <div className="rounded-2xl bg-ice p-4"><dt className="text-sm uppercase tracking-[0.14em]">Shape</dt><dd className="font-semibold">{labelize(product.shape)}</dd></div> : null}
-            </dl>
-          ) : null}
           {sellable ? (
             <>
               <a href={whatsappLink(message)} className="mt-8 inline-flex rounded-full bg-navy px-6 py-3 font-semibold text-white">Buy on WhatsApp</a>

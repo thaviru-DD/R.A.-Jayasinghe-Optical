@@ -4,7 +4,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Photo } from "@/components/Photo";
 import { Reviews } from "@/components/Reviews";
-import { LensTurnCard } from "@/components/LensTurnCard";
+import { CountUpStat } from "@/components/CountUpStat";
+import { FeaturedLenses } from "@/components/FeaturedLenses";
 import { PromoOffer } from "@/components/PromoOffer";
 import {
   ParallaxFrame,
@@ -27,27 +28,6 @@ const services = [
 ];
 
 const ticker = ["Eye testing", "Spectacles", "Sunglasses", "Contact lenses", "Lenses", "Ratmalana"];
-
-const featuredLenses = [
-  {
-    name: "Essilor",
-    description: "Essilor lenses, finished and fitted in our shop to your prescription.",
-    image: "/images/lenses/essilor.png",
-    href: "/lenses",
-  },
-  {
-    name: "Globle",
-    description: "Globle lenses, finished and fitted in our shop to your prescription.",
-    image: "/images/lenses/globle.png",
-    href: "/lenses",
-  },
-  {
-    name: "Novar",
-    description: "Novar lenses, finished and fitted in our shop to your prescription.",
-    image: "/images/lenses/novar.jpg",
-    href: "/lenses",
-  },
-];
 
 type Review = { id: string; name: string; rating: number; comment: string };
 
@@ -149,36 +129,7 @@ export function HomeBody({
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-ice">
-        <div className="pointer-events-none absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-aqua/25 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-4 py-24">
-          <div className="max-w-3xl">
-            <RevealText>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-navy/55">Featured lenses</p>
-            </RevealText>
-            <RevealText delay={0.08}>
-              <h2 className="mt-4 font-heading text-4xl font-semibold tracking-tight md:text-5xl">
-                Three brands we fit in store
-              </h2>
-            </RevealText>
-            <Reveal delay={0.14}>
-              <div className="mt-5 h-px w-24 bg-gradient-to-r from-[#c4a35a] to-transparent" />
-            </Reveal>
-            <RevealText delay={0.18}>
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-navy/70">
-                Essilor, Globle, and Novar — fitted in our Ratmalana shop to your prescription.
-              </p>
-            </RevealText>
-          </div>
-          <Stagger className="mt-14 grid gap-8 lg:grid-cols-3">
-            {featuredLenses.map((lens, index) => (
-              <StaggerItem key={lens.name}>
-                <LensTurnCard {...lens} index={index} />
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </div>
-      </section>
+      <FeaturedLenses />
 
       <section className="relative overflow-hidden bg-[#f7fbfd]">
         <div className="pointer-events-none absolute -right-20 top-16 h-72 w-72 rounded-full bg-aqua/25 blur-3xl" />
@@ -249,16 +200,9 @@ export function HomeBody({
 
             <Reveal delay={0.42}>
               <dl className="mt-10 grid gap-4 sm:grid-cols-3">
-                {[
-                  ["19+", "Years in Ratmalana"],
-                  ["3", "Lens brands fitted"],
-                  ["1", "Shop, full attention"],
-                ].map(([value, label]) => (
-                  <div key={label} className="rounded-[1.4rem] border border-navy/8 bg-white/80 px-4 py-4 shadow-[0_12px_30px_rgba(3,4,94,0.04)]">
-                    <dt className="font-heading text-3xl font-semibold tracking-tight text-navy">{value}</dt>
-                    <dd className="mt-1 text-sm leading-6 text-navy/60">{label}</dd>
-                  </div>
-                ))}
+                <CountUpStat value={19} suffix="+" label="Years in Ratmalana" duration={1200} />
+                <CountUpStat value={3} label="Lens brands fitted" duration={1000} />
+                <CountUpStat value={100000} suffix="+" label="Customers" duration={2200} />
               </dl>
             </Reveal>
           </div>
