@@ -8,7 +8,7 @@ function secret() {
   return new TextEncoder().encode(value);
 }
 
-export async function signSession(payload: { sub: string; username: string }) {
+export async function signSession(payload: { sub: string; username: string; role: "admin" | "customer" }) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -20,7 +20,13 @@ export async function verifySession(token: string) {
   try {
     const { payload } = await jwtVerify(token, secret());
     if (typeof payload.sub !== "string") return null;
-    return { sub: payload.sub, username: String(payload.username ?? "") };
+    const role = payload.role === "admin" ? "admin" : payload.role === "customer" ? "customer" : null;
+    if (!role) return null;
+    return {
+      sub: payload.sub,
+      username: String(payload.username ?? ""),
+      role,
+    };
   } catch {
     return null;
   }

@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import { ProductForm } from "@/components/admin/ProductForm";
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { parseImages } from "@/lib/format";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin();
   const product = await prisma.product.findUnique({ where: { id: (await params).id } });
   if (!product) notFound();
   return (

@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { deleteArticle } from "@/lib/admin-actions";
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export default async function Page() {
+  await requireAdmin();
   const articles = await prisma.article.findMany({ orderBy: { date: "desc" } });
   return (
     <div>
@@ -27,3 +29,4 @@ export default async function Page() {
     </div>
   );
 }
+

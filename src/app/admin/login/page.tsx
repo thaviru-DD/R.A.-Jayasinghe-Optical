@@ -8,8 +8,8 @@ export default function LoginPage() {
   return (
     <main id="content" className="grid min-h-screen place-items-center bg-ice px-4">
       <form action={action} className="w-full max-w-md rounded-[2rem] bg-white p-8 shadow-[0_20px_60px_rgba(3,4,94,0.08)]">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em]">Staff</p>
-        <h1 className="mt-2 font-heading text-3xl font-semibold">Admin login</h1>
+        <p className="text-sm font-semibold uppercase tracking-[0.18em]">Admin</p>
+        <h1 className="mt-2 font-heading text-3xl font-semibold">Owner login</h1>
         <div className="absolute -left-[9999px]" aria-hidden="true">
           <label>Company<input name="company" tabIndex={-1} autoComplete="off" /></label>
         </div>
