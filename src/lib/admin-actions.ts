@@ -83,7 +83,6 @@ const productSchema = z.object({
   inStock: z.string().optional(),
   hidden: z.string().optional(),
   showDiscount: z.string().optional(),
-  featured: z.string().optional(),
 });
 
 export async function saveProduct(_prev: { error?: string } | null, formData: FormData) {
@@ -102,7 +101,6 @@ export async function saveProduct(_prev: { error?: string } | null, formData: Fo
     inStock: formData.get("inStock") || "",
     hidden: formData.get("hidden") || "",
     showDiscount: formData.get("showDiscount") || "",
-    featured: formData.get("featured") || "",
   });
   if (!parsed.success) return { error: "Please complete the product fields." };
   const data = parsed.data;
@@ -149,7 +147,6 @@ export async function saveProduct(_prev: { error?: string } | null, formData: Fo
     showDiscount: data.showDiscount === "on" && Boolean(discountType),
     inStock: data.inStock === "on",
     hidden: data.hidden === "on",
-    featured: data.featured === "on",
     images: JSON.stringify(images),
   };
 

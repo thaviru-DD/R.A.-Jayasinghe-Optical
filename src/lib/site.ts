@@ -62,7 +62,7 @@ export const categoryMeta = {
 export type Category = keyof typeof categoryMeta;
 
 export const shopPhotos = [
-  { src: "/images/products/20.jpg", alt: "An eye test at R.A. Jayasinghe Opticians" },
+  { src: "/images/about-eye-test.jpg", alt: "A child wearing glasses at R.A. Jayasinghe Opticians" },
   { src: "/video/hero-poster.jpg", alt: "Customers looking at frames in the shop" },
   { src: "/images/products/23.jpg", alt: "Frames on display" },
 ];

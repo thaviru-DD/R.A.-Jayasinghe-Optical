@@ -27,7 +27,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           showDiscount: product.showDiscount,
           inStock: product.inStock,
           hidden: product.hidden,
-          featured: product.featured,
           images: parseImages(product.images),
         }}
       />

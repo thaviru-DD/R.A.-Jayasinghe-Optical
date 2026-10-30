@@ -19,7 +19,6 @@ type Values = {
   showDiscount: boolean;
   inStock: boolean;
   hidden: boolean;
-  featured: boolean;
   images: string[];
 };
 
@@ -71,7 +70,6 @@ export function ProductForm({ product }: { product?: Values }) {
       <label className="flex items-center gap-2"><input type="checkbox" name="showDiscount" defaultChecked={product?.showDiscount} /> Show the discount to customers</label>
       <label className="flex items-center gap-2"><input type="checkbox" name="inStock" defaultChecked={product?.inStock ?? true} /> In stock</label>
       <label className="flex items-center gap-2"><input type="checkbox" name="hidden" defaultChecked={product?.hidden} /> Hide from the website</label>
-      <label className="flex items-center gap-2"><input type="checkbox" name="featured" defaultChecked={product?.featured} /> Feature on the home page (lenses)</label>
       {product?.images.length ? (
         <fieldset>
           <legend className="font-semibold">Keep these images</legend>

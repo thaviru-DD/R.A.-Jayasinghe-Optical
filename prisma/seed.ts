@@ -99,11 +99,11 @@ async function main() {
     ["aquaday-monthly", "AquaDay Monthly", "AquaDay", "A monthly contact lens for people who prefer one pair through the month, with proper cleaning.", 2800, "contact-lenses", null, null, null, "percent", 10, true, true, false, false, lens],
     ["clearsoft-monthly", "ClearSoft Monthly", "ClearSoft", "A soft monthly lens with a comfortable edge. We can check the fit before you take a box home.", 3500, "contact-lenses", null, null, null, null, null, false, true, false, false, lens],
     ["clearsoft-toric", "ClearSoft Toric", "ClearSoft", "A toric monthly lens for astigmatism. The final choice is made after your eye test.", 6200, "contact-lenses", null, null, null, null, null, false, true, false, false, lens],
-    ["globle-single-vision", "Globle Single Vision", "Globle", "A clear everyday lens for one viewing distance. We cut and fit it in the shop to your prescription.", 6500, "lenses", null, null, null, null, null, false, true, false, true, lens],
+    ["globle-single-vision", "Globle", "Globle", "Globle lenses, finished and fitted in our shop to your prescription.", 6500, "lenses", null, null, null, null, null, false, true, false, true, ["/images/lenses/globle.png"]],
     ["globle-blue-filter", "Globle Blue Filter", "Globle", "A single-vision Globle lens with a blue-light filter for days spent on screens.", 9800, "lenses", null, null, null, null, null, false, true, false, false, lens],
-    ["novar-anti-reflective", "Novar Anti-Reflective", "Novar", "A Novar lens with an anti-reflective coating, so lights and screens glare less.", 12000, "lenses", null, null, null, null, null, false, true, false, true, lens],
+    ["novar-anti-reflective", "Novar", "Novar", "Novar lenses, finished and fitted in our shop to your prescription.", 12000, "lenses", null, null, null, null, null, false, true, false, true, ["/images/lenses/novar.jpg"]],
     ["novar-progressive", "Novar Progressive", "Novar", "A progressive Novar lens with a smooth change from distance to near. Fitted in store.", 24500, "lenses", null, null, null, null, null, false, true, false, false, lens],
-    ["essilor-single-vision", "Essilor Single Vision", "Essilor", "Essilor single-vision lenses, finished and fitted in our shop to your prescription.", 15000, "lenses", null, null, null, null, null, false, true, false, true, lens],
+    ["essilor-single-vision", "Essilor", "Essilor", "Essilor lenses, finished and fitted in our shop to your prescription.", 15000, "lenses", null, null, null, null, null, false, true, false, true, ["/images/lenses/essilor.png"]],
     ["essilor-progressive", "Essilor Progressive", "Essilor", "Essilor progressive lenses for distance, intermediate, and near vision. Not ordered online.", 32000, "lenses", null, null, null, null, null, false, true, false, false, lens],
   ] as const;
 
@@ -150,15 +150,6 @@ async function main() {
       { name: "Sanduni", rating: 4, comment: "The sunglasses are stylish and the staff take their time.", approved: true },
       { name: "Waiting review", rating: 5, comment: "This one should stay hidden until an admin approves it.", approved: false },
     ],
-  });
-
-  await prisma.banner.create({
-    data: {
-      text: "Book an eye test this month and ask us about lens options in store.",
-      link: "/book",
-      startDate: "2026-01-01",
-      endDate: "2027-12-31",
-    },
   });
 
   await prisma.article.createMany({
