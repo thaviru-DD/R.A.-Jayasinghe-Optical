@@ -1,8 +1,10 @@
 import { deleteHoliday, saveHoliday } from "@/lib/admin-actions";
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatDate } from "@/lib/format";
 
 export default async function Page() {
+  await requireAdmin();
   const holidays = await prisma.holiday.findMany({ orderBy: { date: "asc" } });
   return (
     <div>
@@ -24,3 +26,4 @@ export default async function Page() {
     </div>
   );
 }
+

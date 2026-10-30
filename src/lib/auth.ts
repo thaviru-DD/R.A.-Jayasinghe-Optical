@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { COOKIE, signSession, verifySession } from "@/lib/session";
 
 export async function setSession(id: string, username: string) {
-  const token = await signSession({ sub: id, username });
+  const token = await signSession({ sub: id, username, role: "admin" });
   const jar = await cookies();
   jar.set(COOKIE, token, {
     httpOnly: true,
@@ -29,10 +29,10 @@ export async function readSession() {
 
 export async function getAdmin() {
   const session = await readSession();
-  if (!session) return null;
+  if (!session || session.role !== "admin") return null;
   return prisma.admin.findUnique({
     where: { id: session.sub },
-    select: { id: true, username: true, name: true },
+    select: { id: true, username: true, name: true, role: true },
   });
 }
 

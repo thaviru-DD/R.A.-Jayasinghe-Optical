@@ -12,7 +12,7 @@ const links = [
   ["/admin/banners", "Banners"],
   ["/admin/articles", "Articles"],
   ["/admin/holidays", "Holidays"],
-];
+] as const;
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const admin = await requireAdmin();

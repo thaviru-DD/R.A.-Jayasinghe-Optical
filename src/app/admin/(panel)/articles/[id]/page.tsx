@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { ArticleForm } from "@/components/admin/ArticleForm";
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin();
   const article = await prisma.article.findUnique({ where: { id: (await params).id } });
   if (!article) notFound();
   return (

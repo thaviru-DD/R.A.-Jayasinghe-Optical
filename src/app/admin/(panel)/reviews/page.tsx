@@ -1,7 +1,9 @@
 import { moderateReview } from "@/lib/admin-actions";
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export default async function Page() {
+  await requireAdmin();
   const reviews = await prisma.review.findMany({ orderBy: { createdAt: "desc" } });
   return (
     <div>
@@ -28,3 +30,4 @@ export default async function Page() {
     </div>
   );
 }
+

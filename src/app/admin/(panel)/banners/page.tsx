@@ -1,8 +1,10 @@
 import { deleteBanner } from "@/lib/admin-actions";
 import { BannerForm } from "@/components/admin/BannerForm";
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export default async function Page() {
+  await requireAdmin();
   const banners = await prisma.banner.findMany({ orderBy: { startDate: "desc" } });
   return (
     <div className="grid gap-8 lg:grid-cols-2">
@@ -29,3 +31,4 @@ export default async function Page() {
     </div>
   );
 }
+

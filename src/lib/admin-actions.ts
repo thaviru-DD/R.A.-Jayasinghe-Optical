@@ -177,6 +177,24 @@ export async function deleteProduct(formData: FormData) {
   redirect("/admin/products");
 }
 
+export async function updateProductStock(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("id") || "");
+  const inStock = String(formData.get("inStock") || "") === "1";
+  if (!id) return;
+  await prisma.product.update({ where: { id }, data: { inStock } });
+  refresh();
+}
+
+export async function updateProductPrice(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("id") || "");
+  const price = Number(formData.get("price"));
+  if (!id || !Number.isInteger(price) || price < 1) return;
+  await prisma.product.update({ where: { id }, data: { price } });
+  refresh();
+}
+
 export async function setBookingStatus(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id") || "");

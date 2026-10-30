@@ -1,8 +1,10 @@
 import { BookingBoard } from "@/components/admin/BookingBoard";
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { addDays, colomboToday } from "@/lib/format";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ error?: string; updated?: string }> }) {
+  await requireAdmin();
   const sp = await searchParams;
   const bookings = await prisma.booking.findMany({ orderBy: [{ date: "desc" }, { time: "desc" }] });
   const today = colomboToday();
@@ -31,3 +33,4 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
     </div>
   );
 }
+
