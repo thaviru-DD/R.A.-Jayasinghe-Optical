@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { offer } from "@/components/PromoOffer";
+import type { SiteOffer } from "@/lib/products";
 import { shop } from "@/lib/site";
 
-export function Hero() {
+export function Hero({ offer }: { offer: SiteOffer | null }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [reduce, setReduce] = useState(false);
@@ -48,20 +48,27 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#02033a]/70 via-transparent to-[#02033a]/25" />
       </div>
 
-      <div className="relative z-10 border-b border-[#c4a35a]/25 bg-[#c4a35a]/15 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-3 text-center">
-          <span className="rounded-full bg-[#c4a35a] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#02033a]">
-            {offer.percent} off
-          </span>
-          <p className="text-sm font-medium tracking-wide text-white">
-            Enjoy <span className="font-semibold text-[#c4a35a]">{offer.percent} off</span> selected eyewear — offer ends{" "}
-            <span className="font-semibold text-white">{offer.endsLabel}</span>
-          </p>
-          <Link href={offer.href} className="text-sm font-semibold text-aqua transition hover:text-white">
-            Shop now →
-          </Link>
+      {offer ? (
+        <div className="relative z-10 border-b border-[#c4a35a]/25 bg-[#c4a35a]/15 backdrop-blur-md">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-3 text-center">
+            <span className="rounded-full bg-[#c4a35a] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#02033a]">
+              {offer.percent}% off
+            </span>
+            <p className="text-sm font-medium tracking-wide text-white">
+              Enjoy <span className="font-semibold text-[#c4a35a]">{offer.percent}% off</span> {offer.title}
+              {offer.endsLabel ? (
+                <>
+                  {" "}
+                  — offer ends <span className="font-semibold text-white">{offer.endsLabel}</span>
+                </>
+              ) : null}
+            </p>
+            <Link href={offer.href} className="text-sm font-semibold text-aqua transition hover:text-white">
+              Shop now →
+            </Link>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {!reduce ? (
         <button

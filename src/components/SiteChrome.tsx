@@ -176,7 +176,7 @@ export function SiteChrome({ banner }: { banner: Banner }) {
             <Link href="/" className={navClass(path === "/")}>
               Home
             </Link>
-            <Drop label="Spectacles" href="/spectacles" />
+            <Drop label="Frames" href="/spectacles" />
             <Drop label="Sunglasses" href="/sunglasses" />
             {links.map((link) => (
               <Link key={link.href} href={link.href} className={navClass(path.startsWith(link.href))}>
@@ -257,9 +257,9 @@ export function SiteChrome({ banner }: { banner: Banner }) {
               Home
             </Link>
 
-            <p className="px-3 pt-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4a35a]">Spectacles</p>
+            <p className="px-3 pt-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4a35a]">Frames</p>
             <Link className="block rounded-xl px-3 py-2.5 text-navy/80 hover:bg-[#f7fbfd]" href="/spectacles">
-              All spectacles
+              All frames
             </Link>
             {audiences.map((item) => (
               <Link key={item.slug} className="block rounded-xl px-3 py-2.5 text-navy/80 hover:bg-[#f7fbfd]" href={`/spectacles/${item.slug}`}>

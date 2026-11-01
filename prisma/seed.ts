@@ -115,11 +115,21 @@ async function main() {
     ["essilor-progressive", "Essilor Progressive", "Essilor", "Essilor progressive lenses for distance, intermediate, and near vision. Not ordered online.", 32000, "lenses", null, null, null, null, null, false, true, false, false, lens],
   ] as const;
 
-  for (const item of products) {
+  const stockPrefix: Record<string, string> = {
+    spectacles: "SP",
+    sunglasses: "SG",
+    "contact-lenses": "CL",
+    lenses: "LN",
+  };
+
+  for (const [index, item] of products.entries()) {
     const [slug, name, brand, description, price, category, audience, frameType, shape, discountType, discountValue, showDiscount, inStock, hidden, featured, images] = item;
+    const prefix = stockPrefix[category] || "PD";
+    const stockNumber = `${prefix}-${String(index + 1).padStart(3, "0")}`;
     await prisma.product.create({
       data: {
         slug,
+        stockNumber,
         name,
         brand,
         description,

@@ -14,6 +14,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <ProductForm
         product={{
           id: product.id,
+          stockNumber: product.stockNumber,
           name: product.name,
           brand: product.brand,
           description: product.description,
@@ -27,6 +28,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           showDiscount: product.showDiscount,
           inStock: product.inStock,
           hidden: product.hidden,
+          featured: product.featured,
           images: parseImages(product.images),
         }}
       />

@@ -46,6 +46,7 @@ export const social = {
 export const audiences = [
   { slug: "men", label: "Men" },
   { slug: "women", label: "Women" },
+  { slug: "unisex", label: "Unisex" },
   { slug: "children", label: "Children" },
 ] as const;
 
@@ -66,6 +67,17 @@ export const shopPhotos = [
   { src: "/video/hero-poster.jpg", alt: "Customers looking at frames in the shop" },
   { src: "/images/products/23.jpg", alt: "Frames on display" },
 ];
+
+export const aboutCollage = {
+  main: {
+    src: "/images/about/portrait.jpg",
+    alt: "A woman in black frames and a burgundy hat, smiling softly",
+  },
+  overlay: {
+    src: "/images/about/sunglasses-portrait.webp",
+    alt: "A woman wearing tortoiseshell sunglasses in bright daylight",
+  },
+};
 
 export function labelize(value: string) {
   return value.replace(/(^|[\s-])\w/g, (chunk) => chunk.toUpperCase());

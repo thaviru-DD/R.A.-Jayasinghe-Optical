@@ -6,9 +6,9 @@ export const dynamic = "force-dynamic";
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const admin = await requireAdmin();
   return (
-    <div className="min-h-screen bg-[#f7fbfd] lg:grid lg:grid-cols-[280px_1fr]">
+    <div className="min-h-screen bg-[#f7fbfd] lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
       <AdminSidebar adminName={admin.name} />
-      <main id="content" className="px-4 py-6 md:px-8 md:py-8">
+      <main id="content" className="min-w-0 px-4 py-6 md:px-8 md:py-8">
         {children}
       </main>
     </div>

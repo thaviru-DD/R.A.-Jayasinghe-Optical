@@ -1,7 +1,6 @@
 import { Hero } from "@/components/Hero";
 import { HomeBody } from "@/components/HomeBody";
-import { shopPhotos } from "@/lib/site";
-import { approvedReviews } from "@/lib/products";
+import { approvedReviews, getActiveSiteOffer, homeFeaturedProducts } from "@/lib/products";
 
 export default async function HomePage({
   searchParams,
@@ -9,11 +8,15 @@ export default async function HomePage({
   searchParams: Promise<{ review?: string }>;
 }) {
   const sp = await searchParams;
-  const reviews = await approvedReviews();
+  const [reviews, featuredProducts, offer] = await Promise.all([
+    approvedReviews(),
+    homeFeaturedProducts(),
+    getActiveSiteOffer(),
+  ]);
 
   return (
     <>
-      <Hero />
+      <Hero offer={offer} />
       <HomeBody
         reviews={reviews.map((review) => ({
           id: review.id,
@@ -22,7 +25,8 @@ export default async function HomePage({
           comment: review.comment,
         }))}
         received={sp.review === "received"}
-        aboutImage={shopPhotos[0]}
+        featuredProducts={featuredProducts}
+        offer={offer}
       />
     </>
   );

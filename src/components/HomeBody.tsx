@@ -6,7 +6,9 @@ import { Photo } from "@/components/Photo";
 import { Reviews } from "@/components/Reviews";
 import { CountUpStat } from "@/components/CountUpStat";
 import { FeaturedLenses } from "@/components/FeaturedLenses";
+import { FeaturedProducts } from "@/components/FeaturedProducts";
 import { PromoOffer } from "@/components/PromoOffer";
+import type { PublicProduct, SiteOffer } from "@/lib/products";
 import {
   ParallaxFrame,
   Reveal,
@@ -16,14 +18,14 @@ import {
   StaggerItem,
   luxuryEase,
 } from "@/components/motion";
-import { aboutParagraphs, shop, whatsappLink } from "@/lib/site";
+import { aboutCollage, aboutParagraphs, shop, whatsappLink } from "@/lib/site";
 
 const MotionLink = motion.create(Link);
 
 const services = [
   { title: "Eye testing", text: "Computer-based eye testing for a clear, precise prescription.", href: "/book" },
   { title: "Lenses", text: "Lenses from Globle, Novar, and Essilor, fitted in store.", href: "/lenses" },
-  { title: "Spectacles", text: "Frames for men, women, and children.", href: "/spectacles" },
+  { title: "Spectacles", text: "Frames for men, women, unisex, and children.", href: "/spectacles" },
   { title: "Sunglasses", text: "Shades for the road, the coast, and every bright day.", href: "/sunglasses" },
 ];
 
@@ -34,11 +36,13 @@ type Review = { id: string; name: string; rating: number; comment: string };
 export function HomeBody({
   reviews,
   received,
-  aboutImage,
+  featuredProducts,
+  offer,
 }: {
   reviews: Review[];
   received: boolean;
-  aboutImage: { src: string; alt: string };
+  featuredProducts: PublicProduct[];
+  offer: SiteOffer | null;
 }) {
   return (
     <>
@@ -96,7 +100,7 @@ export function HomeBody({
           </div>
 
           <Reveal delay={0.2} className="mt-10">
-            <PromoOffer tone="gold" />
+            <PromoOffer offer={offer} tone="gold" />
           </Reveal>
 
           <Stagger className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -129,33 +133,62 @@ export function HomeBody({
         </div>
       </section>
 
+      <FeaturedProducts products={featuredProducts} />
+
       <FeaturedLenses />
 
-      <section className="relative overflow-hidden bg-[#f7fbfd]">
-        <div className="pointer-events-none absolute -right-20 top-16 h-72 w-72 rounded-full bg-aqua/25 blur-3xl" />
-        <div className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full bg-navy/5 blur-3xl" />
+      <section className="relative overflow-hidden bg-white">
+        <div className="pointer-events-none absolute -right-20 top-16 h-72 w-72 rounded-full bg-aqua/20 blur-3xl" />
+        <div className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full bg-[#c4a35a]/10 blur-3xl" />
 
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-24 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16">
-          <Reveal y={64} className="relative">
-            <div className="absolute -left-3 top-8 hidden h-[72%] w-px bg-gradient-to-b from-transparent via-[#c4a35a]/70 to-transparent lg:block" />
-            <div className="relative overflow-hidden rounded-[2.4rem] border border-navy/8 bg-white p-3 shadow-[0_28px_80px_rgba(3,4,94,0.1)]">
-              <ParallaxFrame className="relative aspect-[4/5] overflow-hidden rounded-[1.9rem] bg-ice" intensity={64}>
-                <Photo src={aboutImage.src} alt={aboutImage.alt} sizes="(min-width: 1024px) 40vw, 100vw" />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/35 via-transparent to-transparent" />
-              </ParallaxFrame>
+        <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-4 py-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+          <Reveal y={48} className="relative mx-auto w-full max-w-xl lg:mx-0 lg:max-w-none">
+            {/* Magazine collage: large photo + overlay + 2007 tile (ELLE-style) */}
+            <div className="relative mx-auto aspect-[5/6] w-full max-w-[34rem]">
+              <div className="absolute bottom-[10%] left-0 right-[14%] top-0 overflow-hidden bg-[#f0f0f0]">
+                <ParallaxFrame className="h-full w-full" intensity={18}>
+                  <Photo
+                    src={aboutCollage.main.src}
+                    alt={aboutCollage.main.alt}
+                    sizes="(min-width: 1024px) 36vw, 88vw"
+                    className="object-cover object-center"
+                  />
+                </ParallaxFrame>
+              </div>
+
               <motion.div
-                className="absolute bottom-8 left-8 right-8 flex items-end justify-between gap-4"
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3, duration: 0.85, ease: luxuryEase }}
+                className="absolute right-0 top-[4%] z-10 w-[46%] overflow-hidden shadow-[0_18px_40px_rgba(11,31,59,0.12)]"
+                initial={{ opacity: 0, y: 20, x: 10 }}
+                whileInView={{ opacity: 1, y: 0, x: 0 }}
+                viewport={{ once: true, amount: 0.45 }}
+                transition={{ delay: 0.16, duration: 0.85, ease: luxuryEase }}
               >
-                <div className="rounded-[1.4rem] border border-white/30 bg-white/90 px-5 py-4 shadow-[0_16px_40px_rgba(3,4,94,0.12)] backdrop-blur">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-navy/50">Established</p>
-                  <p className="mt-1 font-heading text-3xl font-semibold tracking-tight text-navy">{shop.established}</p>
+                <div className="relative aspect-[4/5]">
+                  <Photo
+                    src={aboutCollage.overlay.src}
+                    alt={aboutCollage.overlay.alt}
+                    sizes="(min-width: 1024px) 16vw, 42vw"
+                    className="object-cover object-[center_15%]"
+                  />
                 </div>
-                <div className="rounded-full border border-white/40 bg-navy/85 px-4 py-2 text-sm font-semibold text-aqua backdrop-blur">
-                  {new Date().getFullYear() - shop.established} years of care
+              </motion.div>
+
+              <motion.div
+                className="absolute bottom-0 left-0 z-20 flex aspect-square w-[40%] max-w-[11.5rem] items-center justify-center bg-[#e8e8e8] px-3 py-4 text-center"
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ delay: 0.28, duration: 0.8, ease: luxuryEase }}
+              >
+                <div>
+                  <p className="font-heading text-[clamp(1.85rem,4.8vw,2.75rem)] font-semibold leading-none tracking-tight text-navy">
+                    {shop.established}
+                  </p>
+                  <p className="mt-2 font-heading text-[clamp(0.72rem,1.7vw,0.95rem)] font-medium leading-tight tracking-[0.04em] text-navy/75">
+                    since
+                    <br />
+                    Ratmalana
+                  </p>
                 </div>
               </motion.div>
             </div>
@@ -232,7 +265,7 @@ export function HomeBody({
                   No login. Choose an open slot up to 30 days ahead. Each appointment is one patient at a time, confirmed by WhatsApp or email.
                 </p>
                 <div className="mt-7">
-                  <PromoOffer tone="dark" />
+                  <PromoOffer offer={offer} tone="dark" />
                 </div>
                 <div className="mt-9 flex flex-wrap gap-3">
                   <MotionLink

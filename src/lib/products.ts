@@ -133,3 +133,40 @@ export async function approvedReviews() {
     take: 12,
   });
 }
+
+export async function homeFeaturedProducts() {
+  const rows = await prisma.product.findMany({
+    where: {
+      featured: true,
+      hidden: false,
+      category: { in: ["spectacles", "sunglasses"] },
+    },
+    orderBy: [{ featuredOrder: "asc" }, { updatedAt: "desc" }],
+    take: 4,
+  });
+  return rows.map(toPublic);
+}
+
+export type SiteOffer = {
+  percent: number;
+  href: string;
+  title: string;
+  endsLabel: string;
+};
+
+/** Homepage offer banners — controlled from Admin → Banners. */
+export async function getActiveSiteOffer(): Promise<SiteOffer | null> {
+  const banner = await prisma.offerBanner.findUnique({ where: { id: "site-offer" } });
+  if (!banner?.enabled) return null;
+  if (banner.percent < 1 || banner.percent >= 100) return null;
+  return {
+    percent: banner.percent,
+    href: banner.href || "/spectacles",
+    title: banner.title || "selected eyewear",
+    endsLabel: banner.endsLabel || "",
+  };
+}
+
+export async function getOfferBannerSettings() {
+  return prisma.offerBanner.findUnique({ where: { id: "site-offer" } });
+}
