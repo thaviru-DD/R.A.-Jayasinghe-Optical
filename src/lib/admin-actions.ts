@@ -1,14 +1,14 @@
 "use server";
 
 import { randomBytes } from "crypto";
-import { mkdir } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import sharp from "sharp";
 import { z } from "zod";
 import { clearSession, getAdmin, requireAdmin, setSession } from "@/lib/auth";
+import { deleteBlobUrls, getBlobReadWriteToken } from "@/lib/blob";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/format";
 import { allow } from "@/lib/rate-limit";
@@ -16,17 +16,40 @@ import { headers } from "next/headers";
 import { BLOCKING_STATUSES, getOpenSlots } from "@/lib/slots";
 
 async function saveUpload(file: File) {
-  if (file.size > 6 * 1024 * 1024) throw new Error("Each image must be under 6 MB.");
+  if (file.size > 6 * 1024 * 1024) {
+    throw new Error("Each image must be under 6 MB.");
+  }
+
+  const token = getBlobReadWriteToken();
   const buffer = Buffer.from(await file.arrayBuffer());
   const name = `${Date.now()}-${randomBytes(4).toString("hex")}.webp`;
-  const dir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(dir, { recursive: true });
+
+  let webpBuffer: Buffer;
   try {
-    await sharp(buffer).rotate().resize({ width: 1600, withoutEnlargement: true }).webp({ quality: 78 }).toFile(path.join(dir, name));
+    webpBuffer = await sharp(buffer)
+      .rotate()
+      .resize({ width: 1600, withoutEnlargement: true })
+      .webp({ quality: 78 })
+      .toBuffer();
   } catch {
     throw new Error("Please upload a JPEG, PNG, or WebP image.");
   }
-  return `/uploads/${name}`;
+
+  try {
+    const blob = await put(name, webpBuffer, {
+      access: "public",
+      contentType: "image/webp",
+      token,
+    });
+    return blob.url;
+  } catch (error) {
+    // Never surface raw token or provider internals to the admin UI.
+    const message = error instanceof Error ? error.message : "";
+    if (/token|auth|unauthorized|forbidden/i.test(message)) {
+      throw new Error("Image upload failed: Blob storage credentials are missing or invalid.");
+    }
+    throw new Error("The image could not be uploaded to Blob storage. Please try again.");
+  }
 }
 
 function refresh() {
@@ -132,7 +155,8 @@ export async function saveProduct(_prev: { error?: string } | null, formData: Fo
   let fileIndex = 0;
   try {
     for (const slot of slots) {
-      if (slot.startsWith("/")) {
+      // Keep existing local paths (/uploads, /images) and absolute Blob URLs.
+      if (slot.startsWith("/") || /^https?:\/\//i.test(slot)) {
         images.push(slot);
         continue;
       }
@@ -256,7 +280,17 @@ export async function saveHomeFeatured(formData: FormData) {
 export async function deleteProduct(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id") || "");
-  if (id) await prisma.product.delete({ where: { id } });
+  if (id) {
+    const existing = await prisma.product.findUnique({ where: { id }, select: { images: true } });
+    await prisma.product.delete({ where: { id } });
+    let urls: string[] = [];
+    try {
+      urls = JSON.parse(existing?.images || "[]") as string[];
+    } catch {
+      urls = [];
+    }
+    await deleteBlobUrls(urls);
+  }
   refresh();
   redirect("/admin/products");
 }
@@ -283,14 +317,16 @@ export async function applyBulkOffer(formData: FormData) {
   await requireAdmin();
   const action = String(formData.get("action") || "apply");
   const category = String(formData.get("category") || "all");
+  const eyewear = { category: { in: ["spectacles", "sunglasses"] } };
   const where =
     category === "spectacles" || category === "sunglasses" || category === "contact-lenses" || category === "lenses"
       ? { category }
-      : undefined;
+      : eyewear;
 
   if (action === "clear") {
     await prisma.product.updateMany({
-      where,
+      // Clearing "all" removes discounts everywhere (including any mistaken lens offers).
+      where: category === "all" ? undefined : where,
       data: { discountType: null, discountValue: null, showDiscount: false },
     });
     refresh();
@@ -370,8 +406,9 @@ export async function saveBanner(_prev: { error?: string } | null, formData: For
   });
   if (!parsed.success) return { error: "Check the banner text and dates." };
   if (parsed.data.endDate < parsed.data.startDate) return { error: "The end date must be on or after the start date." };
+  const previousImage = String(formData.get("currentImage") || "") || null;
   const file = formData.get("image");
-  let image = String(formData.get("currentImage") || "") || null;
+  let image = previousImage;
   if (formData.get("removeImage") === "on") image = null;
   if (file instanceof File && file.size > 0) {
     try {
@@ -384,6 +421,7 @@ export async function saveBanner(_prev: { error?: string } | null, formData: For
   const data = { text: parsed.data.text, link: parsed.data.link || null, startDate: parsed.data.startDate, endDate: parsed.data.endDate, image };
   if (id) await prisma.banner.update({ where: { id }, data });
   else await prisma.banner.create({ data });
+  if (previousImage && previousImage !== image) await deleteBlobUrls([previousImage]);
   refresh();
   redirect("/admin/banners");
 }
@@ -391,7 +429,11 @@ export async function saveBanner(_prev: { error?: string } | null, formData: For
 export async function deleteBanner(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id") || "");
-  if (id) await prisma.banner.delete({ where: { id } });
+  if (id) {
+    const existing = await prisma.banner.findUnique({ where: { id }, select: { image: true } });
+    await prisma.banner.delete({ where: { id } });
+    await deleteBlobUrls([existing?.image]);
+  }
   refresh();
 }
 
@@ -437,7 +479,9 @@ export async function saveOfferBanner(_prev: { error?: string; ok?: boolean } | 
   });
 
   if (parsed.data.syncProducts === "on" && enabled) {
+    // Only eyewear catalogs — never apply storefront % offers to lenses / contact lenses.
     await prisma.product.updateMany({
+      where: { category: { in: ["spectacles", "sunglasses"] } },
       data: {
         discountType: "percent",
         discountValue: parsed.data.percent,
@@ -470,8 +514,9 @@ export async function saveArticle(_prev: { error?: string } | null, formData: Fo
     published: formData.get("published") || "",
   });
   if (!parsed.success) return { error: "Please complete the article." };
+  const previousCover = String(formData.get("currentCover") || "") || null;
   const file = formData.get("cover");
-  let cover = String(formData.get("currentCover") || "") || null;
+  let cover = previousCover;
   if (file instanceof File && file.size > 0) {
     try {
       cover = await saveUpload(file);
@@ -493,6 +538,7 @@ export async function saveArticle(_prev: { error?: string } | null, formData: Fo
     }
     await prisma.article.create({ data: { ...payload, slug } });
   }
+  if (previousCover && previousCover !== cover) await deleteBlobUrls([previousCover]);
   refresh();
   redirect("/admin/articles");
 }
@@ -500,7 +546,11 @@ export async function saveArticle(_prev: { error?: string } | null, formData: Fo
 export async function deleteArticle(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id") || "");
-  if (id) await prisma.article.delete({ where: { id } });
+  if (id) {
+    const existing = await prisma.article.findUnique({ where: { id }, select: { cover: true } });
+    await prisma.article.delete({ where: { id } });
+    await deleteBlobUrls([existing?.cover]);
+  }
   refresh();
   redirect("/admin/articles");
 }

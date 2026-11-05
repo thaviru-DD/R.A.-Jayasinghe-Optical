@@ -14,16 +14,18 @@ out/
 build/
 dist/
 
-# env / secrets
+# env / secrets (keep the example only)
 .env
 .env.*
 !.env.example
 
-# prisma / sqlite
+# prisma / sqlite / dumps
 prisma/*.db
 prisma/*.db-journal
 prisma/*.db-shm
 prisma/*.db-wal
+prisma/*.sql
+*.sql
 
 # uploads (keep folder)
 public/uploads/*
@@ -42,9 +44,10 @@ next-env.d.ts
 .eslintcache
 .turbo/
 
-# testing / coverage
+# testing / coverage / scratch
 coverage/
 .nyc_output/
+test-turso.ts
 
 # vercel / deploy
 .vercel/

@@ -1,6 +1,34 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 
+/**
+ * SAFETY: this seed DELETES all records in the Prisma datasource then recreates demo content.
+ * It always uses DATABASE_URL from the schema (local SQLite). Runtime Turso is separate (src/lib/db.ts).
+ *
+ *   ALLOW_DB_SEED=1 npm run db:seed
+ */
+function assertSeedAllowed() {
+  if (process.env.ALLOW_DB_SEED !== "1") {
+    throw new Error(
+      "Refusing to seed: this script deletes existing records. Set ALLOW_DB_SEED=1 for a disposable local database only.",
+    );
+  }
+  if (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production") {
+    throw new Error("Refusing to seed: production environment detected.");
+  }
+
+  const databaseUrl = process.env.DATABASE_URL?.trim() ?? "";
+  if (!databaseUrl.startsWith("file:")) {
+    throw new Error(
+      "Refusing to seed: DATABASE_URL must be a local file: SQLite URL (for example file:./dev.db). Remote databases are not seeded by this script.",
+    );
+  }
+}
+
+assertSeedAllowed();
+
+// Seed targets the Prisma schema datasource (DATABASE_URL / local SQLite).
+// Runtime app traffic uses Turso via src/lib/db.ts — keep those concerns separate.
 const prisma = new PrismaClient();
 
 const spec = [
@@ -63,6 +91,7 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.admin.deleteMany();
 
+  // Dev-only default password. Change immediately on any shared or remote environment.
   const sharedPassword = await bcrypt.hash("RAJ-admin-327", 10);
   const admins = [
     ["owner", "Shop owner"],
